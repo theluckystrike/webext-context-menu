@@ -1,5 +1,5 @@
 {
-  "name": "webext-context-menu",
+  "name": "@theluckystrike/webext-context-menu",
   "version": "1.0.0",
   "description": "Typed context menu builder with nested menus for Chrome extensions",
   "main": "dist/index.js",
@@ -13,7 +13,8 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsc",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepare": "npm run build"
   },
   "keywords": ["chrome-extension", "context-menu", "webextension", "typescript"],
   "author": "theluckystrike",
