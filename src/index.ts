@@ -37,6 +37,12 @@ interface RegisteredItem {
 }
 
 const registry: Map<string, RegisteredItem> = new Map();
+let listenerAttached = false;
+
+export function _resetForTesting(): void {
+  registry.clear();
+  listenerAttached = false;
+}
 
 export class MenuItem {
   private item: RegisteredItem;
@@ -107,12 +113,15 @@ export function registerMenus(items: MenuItem[]): void {
     }
   });
 
-  chrome.contextMenus.onClicked.addListener((info, tab) => {
-    const item = registry.get(info.menuItemId as string);
-    if (item?.onClick) {
-      item.onClick(info, tab);
-    }
-  });
+  if (!listenerAttached) {
+    listenerAttached = true;
+    chrome.contextMenus.onClicked.addListener((info, tab) => {
+      const item = registry.get(info.menuItemId as string);
+      if (item?.onClick) {
+        item.onClick(info, tab);
+      }
+    });
+  }
 }
 
 export function updateMenu(

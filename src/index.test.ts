@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MenuItem, createMenu, createSeparator, registerMenus, updateMenu, removeMenu, removeAllMenus } from "./index";
+import { MenuItem, createMenu, createSeparator, registerMenus, updateMenu, removeMenu, removeAllMenus, _resetForTesting } from "./index";
 
 // Mock chrome API
 const mockCreate = vi.fn();
@@ -23,6 +23,7 @@ globalAny.chrome = {
 describe("webext-context-menu", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    _resetForTesting();
     globalAny.chrome.runtime.lastError = null;
   });
 
