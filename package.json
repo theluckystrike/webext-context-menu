@@ -4,11 +4,20 @@
   "description": "Typed context menu builder with nested menus for Chrome extensions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theluckystrike/webext-context-menu.git"
+  },
+  "homepage": "https://github.com/theluckystrike/webext-context-menu#readme",
+  "bugs": {
+    "url": "https://github.com/theluckystrike/webext-context-menu/issues"
   },
   "files": [
     "dist",
@@ -28,6 +37,9 @@
   ],
   "author": "theluckystrike",
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
     "@types/chrome": "^0.0.287",
     "typescript": "^5.7.0",
