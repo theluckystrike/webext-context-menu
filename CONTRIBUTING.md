@@ -14,7 +14,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 3. **Install dependencies**
    ```bash
-   npm install
+   pnpm install
    ```
 
 4. **Create a feature branch**
@@ -28,12 +28,12 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 2. **Run tests**
    ```bash
-   npm test
+   pnpm test
    ```
 
 3. **Build the project**
    ```bash
-   npm run build
+   pnpm run build
    ```
 
 4. **Commit your changes**
