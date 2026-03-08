@@ -20,19 +20,19 @@ Typed context menu builder with nested menus and fluent API for Chrome extension
 ## Install
 
 ```bash
-npm install webext-context-menu
+npm install @theluckystrike/webext-context-menu
 ```
 
 Or with pnpm:
 
 ```bash
-pnpm add webext-context-menu
+pnpm add @theluckystrike/webext-context-menu
 ```
 
 Or with yarn:
 
 ```bash
-yarn add webext-context-menu
+yarn add @theluckystrike/webext-context-menu
 ```
 
 ## Quick Start
