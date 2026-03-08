@@ -1,7 +1,7 @@
 {
   "name": "@theluckystrike/webext-context-menu",
   "version": "1.0.0",
-  "description": "Typed context menu builder with nested menus for Chrome extensions",
+  "description": "Typed context menu builder with nested menus for Chrome extensions. Part of @zovo/webext.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -23,8 +23,13 @@
   "keywords": [
     "chrome-extension",
     "context-menu",
+    "right-click",
+    "typescript",
     "webextension",
-    "typescript"
+    "browser-extension",
+    "manifest-v3",
+    "chrome-contextMenus",
+    "nested-menu"
   ],
   "author": "theluckystrike",
   "license": "MIT",

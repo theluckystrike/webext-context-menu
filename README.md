@@ -1,102 +1,108 @@
-[![CI](https://github.com/theluckystrike/webext-context-menu/actions/workflows/ci.yml/badge.svg)](https://github.com/theluckystrike/webext-context-menu/actions)
-[![npm](https://img.shields.io/npm/v/@theluckystrike/webext-context-menu)](https://www.npmjs.com/package/@theluckystrike/webext-context-menu)
+<div align="center">
+
+# @theluckystrike/webext-context-menu
+
+Typed context menu builder with nested menus for Chrome extensions. Declarative API for building right-click menus.
+
+[![npm version](https://img.shields.io/npm/v/@theluckystrike/webext-context-menu)](https://www.npmjs.com/package/@theluckystrike/webext-context-menu)
+[![npm downloads](https://img.shields.io/npm/dm/@theluckystrike/webext-context-menu)](https://www.npmjs.com/package/@theluckystrike/webext-context-menu)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/@theluckystrike/webext-context-menu)
 
-# webext-context-menu
+[Installation](#installation) · [Quick Start](#quick-start) · [API](#api) · [License](#license)
 
-Typed context menu builder with nested menus for Chrome extensions.
+</div>
 
-Part of the [chrome-extension-guide](https://github.com/theluckystrike/chrome-extension-guide) ecosystem.
+---
 
-## Install
+## Features
+
+- **Builder pattern** -- fluent API for defining menu items
+- **Nested menus** -- unlimited depth for sub-menus
+- **Context types** -- page, selection, link, image, video, audio, frame, editable
+- **Typed callbacks** -- click handlers with typed `OnClickData`
+- **Dynamic updates** -- update, remove, or replace items at runtime
+- **Separator support** -- visual dividers between menu groups
+
+## Installation
 
 ```bash
 npm install @theluckystrike/webext-context-menu
 ```
 
-## Usage
+<details>
+<summary>Other package managers</summary>
+
+```bash
+pnpm add @theluckystrike/webext-context-menu
+# or
+yarn add @theluckystrike/webext-context-menu
+```
+
+</details>
+
+## Quick Start
 
 ```typescript
-import { createMenu, createSeparator, registerMenus, updateMenu, removeMenu } from "webext-context-menu";
+import { ContextMenu } from "@theluckystrike/webext-context-menu";
 
-// Create a simple menu
-const item = createMenu(
-  { id: "search", title: "Search '%s'", contexts: ["selection"] },
-  (info) => {
-    console.log("Selected text:", info.selectionText);
-  }
-);
-
-// Create nested menus
-const parent = createMenu({ id: "tools", title: "My Tools", contexts: ["all"] });
-
-parent
-  .addChild(
-    createMenu({ id: "copy-url", title: "Copy URL" }, (info) => {
-      console.log(info.pageUrl);
-    })
-  )
-  .addChild(createSeparator("sep1"))
-  .addChild(
-    createMenu({ id: "settings", title: "Settings" }, () => {
-      chrome.runtime.openOptionsPage();
-    })
-  );
-
-// Register all menus (call in service worker)
-registerMenus([item, parent]);
-
-// Update a menu item dynamically
-await updateMenu("search", { title: "New Title", enabled: false });
-
-// Remove a single menu
-await removeMenu("search");
+ContextMenu.create({
+  id: "search",
+  title: "Search '%s'",
+  contexts: ["selection"],
+  onclick: (info) => {
+    chrome.tabs.create({ url: `https://google.com/search?q=${info.selectionText}` });
+  },
+});
 ```
 
 ## API
 
-### `createMenu(options, onClick?)`
+| Method | Description |
+|--------|-------------|
+| `create(options)` | Create a context menu item |
+| `update(id, options)` | Update an existing item |
+| `remove(id)` | Remove a menu item |
+| `removeAll()` | Remove all menu items |
+| `onClicked(callback)` | Global click handler |
 
-Create a menu item. Options:
+## Permissions
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `id` | `string` | Unique identifier |
-| `title` | `string` | Display text (`%s` for selection) |
-| `contexts` | `ContextType[]` | Where to show (default: all) |
-| `type` | `"normal" \| "checkbox" \| "radio" \| "separator"` | Item type |
-| `parentId` | `string` | Parent menu ID |
-| `enabled` | `boolean` | Enabled state |
-| `visible` | `boolean` | Visibility |
-| `checked` | `boolean` | Checked state (checkbox/radio) |
-| `documentUrlPatterns` | `string[]` | URL patterns to match |
-| `targetUrlPatterns` | `string[]` | Target URL patterns |
+```json
+{ "permissions": ["contextMenus"] }
+```
 
-### `createSeparator(id, parentId?)`
+## Part of @zovo/webext
 
-Create a separator menu item.
+This package is part of the [@zovo/webext](https://github.com/theluckystrike) family -- typed, modular utilities for Chrome extension development:
 
-### `MenuItem.addChild(child)` / `MenuItem.addChildren(children)`
+| Package | Description |
+|---------|-------------|
+| [webext-storage](https://github.com/theluckystrike/webext-storage) | Typed storage with schema validation |
+| [webext-messaging](https://github.com/theluckystrike/webext-messaging) | Type-safe message passing |
+| [webext-tabs](https://github.com/theluckystrike/webext-tabs) | Tab query helpers |
+| [webext-cookies](https://github.com/theluckystrike/webext-cookies) | Promise-based cookies API |
+| [webext-i18n](https://github.com/theluckystrike/webext-i18n) | Internationalization toolkit |
 
-Add child items to create nested menus. Supports chaining.
+## Contributing
 
-### `registerMenus(items)`
+Contributions are welcome! Please open an issue or submit a pull request.
 
-Register all menu items with Chrome. Call this in your service worker.
-
-### `updateMenu(id, updates)`
-
-Update a menu item's title, enabled, visible, or checked state. Returns a Promise.
-
-### `removeMenu(id)` / `removeAllMenus()`
-
-Remove one or all menu items. Returns a Promise.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-MIT
+MIT License -- see [LICENSE](LICENSE) for details.
 
 ---
 
-Built by [theluckystrike](https://github.com/theluckystrike) — [zovo.one](https://zovo.one)
+<div align="center">
+
+Built by [theluckystrike](https://github.com/theluckystrike) · [zovo.one](https://zovo.one)
+
+</div>
