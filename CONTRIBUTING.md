@@ -1,70 +1,45 @@
 # Contributing to webext-context-menu
 
-Thank you for your interest in contributing! This guide will help you get started.
+Thank you for your interest in contributing! This library is part of the [zovo/webext](https://github.com/theluckystrike/webext) ecosystem.
 
-## Development Setup
+## Getting Started
 
-1. **Fork the repository**
+1. **Fork** the repository
+2. **Clone** your fork: `git clone https://github.com/YOUR_USERNAME/webext-context-menu.git`
+3. **Install dependencies**: `pnpm install`
 
-2. **Clone your fork**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/webext-context-menu.git
-   cd webext-context-menu
-   ```
+## Development
 
-3. **Install dependencies**
-   ```bash
-   pnpm install
-   ```
+```bash
+# Run tests
+pnpm test
 
-4. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-## Development Workflow
-
-1. **Make your changes** in the `src/` directory
-
-2. **Run tests**
-   ```bash
-   pnpm test
-   ```
-
-3. **Build the project**
-   ```bash
-   pnpm run build
-   ```
-
-4. **Commit your changes**
-   ```bash
-   git add .
-   git commit -m "feat: add new feature"
-   ```
-
-## Pull Request Process
-
-1. Push your branch to your fork:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-2. Open a Pull Request against the `main` branch
-
-3. Ensure:
-   - All tests pass
-   - Code builds without errors
-   - New features include tests
+# Build TypeScript
+pnpm run build
+```
 
 ## Code Style
 
-- Use TypeScript with strict mode
-- Follow existing code conventions
-- Add JSDoc comments for public APIs
+- Use **TypeScript** for all new code
+- Follow the existing code style (2 spaces, semicolons)
+- Add types for function parameters and return values
+- Keep functions focused and small
+
+## Submitting Changes
+
+1. Create a feature branch: `git checkout -b feature/my-feature`
+2. Make your changes
+3. Run tests: `pnpm test`
+4. Commit with clear messages: `git commit -m "Add feature X"`
+5. Push to your fork: `git push origin feature/my-feature`
+6. Open a Pull Request
 
 ## Reporting Issues
 
-Use the [GitHub Issues](https://github.com/theluckystrike/webext-context-menu/issues) to report bugs or request features.
+Use GitHub Issues to report bugs or request features. Include:
+- Clear description
+- Steps to reproduce
+- Relevant code samples
 
 ## License
 
