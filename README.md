@@ -1,117 +1,287 @@
 [![CI](https://github.com/theluckystrike/webext-context-menu/actions/workflows/ci.yml/badge.svg)](https://github.com/theluckystrike/webext-context-menu/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/@theluckystrike/webext-context-menu)](https://www.npmjs.com/package/@theluckystrike/webext-context-menu)
-[![Downloads](https://img.shields.io/npm/dm/@theluckystrike/webext-context-menu)](https://www.npmjs.com/package/@theluckystrike/webext-context-menu)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
-[![Bundle Size](https://img.shields.io/bundlephobia/min/@theluckystrike/webext-context-menu)](https://bundlephobia.com/package/@theluckystrike/webext-context-menu)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@theluckystrike/webext-context-menu)](https://bundlephobia.com/package/@theluckystrike/webext-context-menu)
 
 # webext-context-menu
 
-A type-safe, fluent API for building Chrome extension context menus with support for nested menus, click handlers, and dynamic updates.
+> Typed context menu builder with nested menus for Chrome extensions
+
+A fluent, type-safe API for creating and managing Chrome context menus. Build complex nested menus with ease using the builder pattern, with full TypeScript support and runtime updates.
+
+Part of the [@zovo/webext](https://github.com/theluckystrike/webext) ecosystem.
 
 ## Features
 
-- **🛡️ TypeScript First** — Full type safety with autocomplete for all menu options
-- **📦 Fluent API** — Chainable methods for building nested menus effortlessly
-- **🔄 Dynamic Updates** — Update titles, visibility, enabled state, and checked state at runtime
-- **🎯 Context Awareness** — Support for all Chrome context types (selection, link, image, etc.)
-- **📂 Nested Menus** — Create complex multi-level menu hierarchies with ease
-- **🧪 Well Tested** — Comprehensive test suite with Vitest
+- **Fluent Builder API** — Chain methods to build complex menu structures
+- **Nested Submenus** — Create unlimited depth menu hierarchies
+- **Context-Aware Items** — Support for page, selection, link, image, and more
+- **Separators** — Visual dividers between menu groups
+- **Radio & Checkbox** — Grouped selection with radio/checkbox types
+- **Dynamic Updates** — Update or remove menu items at runtime
+- **Typed Click Handlers** — Full TypeScript support for click callbacks
+- **Promise-Based API** — Clean async/await interface for updates
 
-## Installation
+## Install
 
 ```bash
 npm install @theluckystrike/webext-context-menu
 ```
 
+Or with pnpm:
+
+```bash
+pnpm add @theluckystrike/webext-context-menu
+```
+
 ## Quick Start
 
-```typescript
-import { createMenu, createSeparator, registerMenus } from "@theluckystrike/webext-context-menu";
+### Simple Menu Item
 
-// Create a simple context menu item
+```typescript
+import { createMenu, registerMenus } from "webext-context-menu";
+
+// Create a menu item for selected text
 const searchItem = createMenu(
   { id: "search", title: "Search '%s'", contexts: ["selection"] },
-  (info) => {
+  (info, tab) => {
     const query = encodeURIComponent(info.selectionText || "");
-    window.open(`https://google.com/search?q=${query}`);
+    chrome.tabs.create({ url: `https://google.com/search?q=${query}` });
   }
 );
 
-// Register your menus in the service worker
+// Register in your extension's service worker
 registerMenus([searchItem]);
+```
+
+### Menu with Submenu
+
+```typescript
+import { createMenu, createSeparator, registerMenus } from "webext-context-menu";
+
+// Create parent menu
+const toolsMenu = createMenu({ id: "tools", title: "Developer Tools", contexts: ["all"] });
+
+// Add nested items
+toolsMenu
+  .addChild(
+    createMenu({ id: "copy-url", title: "Copy Page URL" }, (info, tab) => {
+      navigator.clipboard.writeText(tab?.url || "");
+    })
+  )
+  .addChild(createSeparator("sep1"))
+  .addChild(
+    createMenu({ id: "open-settings", title: "Open Settings" }, () => {
+      chrome.runtime.openOptionsPage();
+    })
+  );
+
+registerMenus([toolsMenu]);
+```
+
+## Builder Pattern Showcase
+
+The fluent API lets you build complex multi-level menus with elegant chaining:
+
+```typescript
+import { createMenu, createSeparator, registerMenus } from "webext-context-menu";
+
+// Build a complete menu hierarchy
+const root = createMenu({ id: "root", title: "My Extension", contexts: ["page"] });
+
+// First level: Development tools
+const devTools = createMenu({ id: "dev", title: "🔧 Dev Tools" });
+const inspectEl = createMenu({ id: "inspect", title: "Inspect Element" }, () => {
+  console.log("Inspect mode activated");
+});
+const consoleEl = createMenu({ id: "console", title: "View Console" });
+
+devTools.addChild(inspectEl).addChild(consoleEl);
+
+// Second level: Clipboard operations
+const clipboard = createMenu({ id: "clipboard", title: "📋 Clipboard" });
+clipboard
+  .addChild(createMenu({ id: "copy-title", title: "Copy Title" }))
+  .addChild(createMenu({ id: "copy-url", title: "Copy URL" }))
+  .addChild(createSeparator("clip-sep"))
+  .addChild(createMenu({ id: "copy-html", title: "Copy as HTML" }));
+
+// Third level: Export options (radio group)
+const exportMenu = createMenu({ id: "export", title: "Export as..." });
+exportMenu
+  .addChild(createMenu({ id: "export-json", title: "JSON", type: "radio", checked: true }))
+  .addChild(createMenu({ id: "export-csv", title: "CSV", type: "radio" }))
+  .addChild(createMenu({ id: "export-xml", title: "XML", type: "radio" }));
+
+clipboard.addChild(exportMenu);
+
+// Add all top-level items
+root.addChildren([devTools, clipboard]);
+
+// Register everything
+registerMenus([root]);
+```
+
+## Context Types
+
+The library supports all Chrome context menu contexts:
+
+```typescript
+// Page context — shows when clicking anywhere on a page
+const pageItem = createMenu({
+  id: "page-action",
+  title: "On Page",
+  contexts: ["page"]
+});
+
+// Selection context — shows when text is selected
+const selectionItem = createMenu({
+  id: "search-selection",
+  title: "Search '%s'",
+  contexts: ["selection"]
+});
+
+// Link context — shows when right-clicking a link
+const linkItem = createMenu({
+  id: "open-link",
+  title: "Open Link in Tab",
+  contexts: ["link"]
+});
+
+// Image context — shows when right-clicking an image
+const imageItem = createMenu({
+  id: "copy-image",
+  title: "Copy Image Address",
+  contexts: ["image"]
+});
+
+// Multiple contexts — combine as needed
+const multiContext = createMenu({
+  id: "multi",
+  title: "Works on page or image",
+  contexts: ["page", "image"]
+});
+
+// All contexts — show everywhere
+const allContext = createMenu({
+  id: "everywhere",
+  title: "Universal Menu",
+  contexts: ["all"]
+});
+```
+
+### Context Types Reference
+
+| Context | Description |
+|---------|-------------|
+| `all` | All contexts except `launcher` |
+| `page` | Page content (except images, links, etc.) |
+| `frame` | Top-level or selected frame |
+| `selection` | Text selection |
+| `link` | Hyperlink |
+| `editable` | Editable elements (input, textarea) |
+| `image` | Image element |
+| `video` | Video element |
+| `audio` | Audio element |
+| `action` | Browser action icon |
+| `browser_action` | Browser action (Chromium) |
+| `page_action` | Page action (Chromium) |
+
+## Dynamic Menus
+
+Update or remove menu items at runtime:
+
+```typescript
+import { updateMenu, removeMenu, removeAllMenus } from "webext-context-menu";
+
+// Update a menu item's title
+await updateMenu("search", { title: "New Title" });
+
+// Disable a menu item
+await updateMenu("tools", { enabled: false });
+
+// Show/hide based on context
+await updateMenu("admin-panel", { visible: false });
+
+// Check/uncheck radio or checkbox items
+await updateMenu("option-1", { checked: true });
+
+// Remove single menu item
+await removeMenu("old-item");
+
+// Clear all menus (useful when reinstalling)
+await removeAllMenus();
+```
+
+### Conditional Menu Visibility
+
+```typescript
+// Enable/disable based on page URL patterns
+const urlSensitiveItem = createMenu({
+  id: "url-item",
+  title: "URL Actions",
+  contexts: ["page"],
+  documentUrlPatterns: ["https://*.example.com/*"]
+});
 ```
 
 ## API Reference
 
 ### `createMenu(options, onClick?)`
 
-Creates a new menu item. Returns a `MenuItem` instance that supports chaining.
+Creates a new menu item with the builder pattern.
 
-**Options:**
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `id` | `string` | Required | Unique identifier for the menu item |
-| `title` | `string` | Required | Display text. Use `%s` to insert selected text |
-| `type` | `"normal" \| "checkbox" \| "radio" \| "separator"` | `"normal"` | Menu item type |
-| `contexts` | `ContextType[]` | `["all"]` | Contexts where the menu appears |
-| `parentId` | `string` | `undefined` | Parent menu ID for nesting |
-| `enabled` | `boolean` | `true` | Whether the item is enabled |
-| `visible` | `boolean` | `true` | Whether the item is visible |
-| `checked` | `boolean` | `false` | Checked state (checkbox/radio only) |
-| `documentUrlPatterns` | `string[]` | `undefined` | URL patterns to match (using match patterns) |
-| `targetUrlPatterns` | `string[]` | `undefined` | Target URL patterns for links/images |
-
-**Click Handler Signature:**
 ```typescript
-type ClickHandler = (
-  info: chrome.contextMenus.OnClickData,
-  tab?: chrome.tabs.Tab
-) => void;
+const item = createMenu(
+  {
+    id: string,           // Unique identifier (required)
+    title: string,        // Display text (required)
+    contexts?: ContextType[],  // Where to show (default: ["all"])
+    type?: "normal" | "checkbox" | "radio" | "separator",
+    parentId?: string,    // Parent menu ID for nesting
+    enabled?: boolean,   // Enabled state (default: true)
+    visible?: boolean,   // Visibility (default: true)
+    checked?: boolean,   // Checked state (checkbox/radio)
+    documentUrlPatterns?: string[], // URL patterns to match
+    targetUrlPatterns?: string[],   // Target URL patterns (links/images)
+  },
+  onClick?: (info: OnClickData, tab?: Tab) => void
+): MenuItem
 ```
 
 ### `createSeparator(id, parentId?)`
 
-Creates a separator line for visual grouping of menu items.
+Creates a visual separator between menu items.
+
+```typescript
+const sep = createSeparator("separator-1", "parent-id");
+```
 
 ### `MenuItem.addChild(child)` / `MenuItem.addChildren(children)`
 
-Add child menu items to create nested menus. Returns the parent for chaining.
+Adds child items to create nested menus. Returns `this` for chaining.
 
 ```typescript
-const parent = createMenu({ id: "tools", title: "Tools" });
-parent
-  .addChild(createMenu({ id: "copy", title: "Copy" }, handler))
-  .addChild(createSeparator("sep1"))
-  .addChild(createMenu({ id: "paste", title: "Paste" }, handler));
+parent.addChild(child);
+parent.addChildren([child1, child2, child3]);
 ```
 
 ### `registerMenus(items)`
 
-Registers all menu items with Chrome's contextMenus API. Call this in your **service worker** or background script. This also sets up the click listener automatically.
+Registers all menu items with Chrome. Call this in your extension's service worker.
 
 ```typescript
-// In your service worker (e.g., service-worker.ts)
-import { registerMenus, createMenu } from "@theluckystrike/webext-context-menu";
-
-const menu = createMenu({ id: "hello", title: "Hello" }, () => {
-  console.log("Menu clicked!");
-});
-
-registerMenus([menu]);
+registerMenus([item1, item2, item3]);
 ```
 
 ### `updateMenu(id, updates)`
 
-Dynamically update a menu item's properties. Returns a Promise.
+Updates a menu item's properties. Returns a Promise.
 
 ```typescript
-import { updateMenu } from "@theluckystrike/webext-context-menu";
-
-// Update multiple properties
-await updateMenu("search", { 
-  title: "New Title", 
+await updateMenu("my-item", {
+  title: "New Title",
   enabled: false,
   visible: true,
   checked: false
@@ -120,158 +290,40 @@ await updateMenu("search", {
 
 ### `removeMenu(id)` / `removeAllMenus()`
 
-Remove individual menu items or clear all menus. Returns a Promise.
+Removes menu items. Returns a Promise.
 
 ```typescript
-import { removeMenu, removeAllMenus } from "@theluckystrike/webext-context-menu";
-
-// Remove a single item
-await removeMenu("old-menu");
-
-// Clear all menus
+await removeMenu("item-id");
 await removeAllMenus();
 ```
 
-### Context Types
+## Permissions
 
-Available contexts for menu placement:
+Add the `contextMenus` permission to your `manifest.json`:
 
-```typescript
-type ContextType =
-  | "all"        // All contexts
-  | "page"       // Page context
-  | "frame"      // Frame context
-  | "selection" // Text selection
-  | "link"       // Links
-  | "editable"   // Editable elements
-  | "image"      // Images
-  | "video"      // Videos
-  | "audio"      // Audio
-  | "action"     // Browser action
-  | "browser_action" // Browser action (legacy)
-  | "page_action";    // Page action
-```
-
-## Examples
-
-### Example 1: Selection Search Menu
-
-Search selected text in different search engines:
-
-```typescript
-import { createMenu, registerMenus } from "@theluckystrike/webext-context-menu";
-
-const searchEngine = (name: string, url: string) =>
-  createMenu(
-    { id: `search-${name}`, title: name, parentId: "search-menu" },
-    (info) => {
-      const query = encodeURIComponent(info.selectionText || "");
-      window.open(`${url}${query}`);
-    }
-  );
-
-const searchMenu = createMenu({ id: "search-menu", title: "Search..." });
-searchMenu.addChildren([
-  searchEngine("Google", "https://google.com/search?q="),
-  searchEngine("Bing", "https://bing.com/search?q="),
-  searchEngine("DuckDuckGo", "https://duckduckgo.com/?q="),
-]);
-
-registerMenus([searchMenu]);
-```
-
-### Example 2: Link Actions Menu
-
-Perform actions on links:
-
-```typescript
-import { createMenu, createSeparator, registerMenus } from "@theluckystrike/webext-context-menu";
-
-const linkActions = createMenu({ id: "link-actions", title: "Link Actions", contexts: ["link"] });
-
-linkActions
-  .addChild(createMenu({ id: "copy-link", title: "Copy Link" }, (info) => {
-    navigator.clipboard.writeText(info.linkUrl || "");
-  }))
-  .addChild(createSeparator("sep1"))
-  .addChild(createMenu({ id: "open-new-tab", title: "Open in New Tab" }, (info) => {
-    window.open(info.linkUrl, "_blank");
-  }))
-  .addChild(createMenu({ id: "open-incognito", title: "Open in Incognito" }, (info) => {
-    chrome.windows.create({ url: info.linkUrl, incognito: true });
-  }));
-
-registerMenus([linkActions]);
-```
-
-### Example 3: Checkbox Menu for Settings
-
-A menu with toggleable options:
-
-```typescript
-import { createMenu, registerMenus, updateMenu } from "@theluckystrike/webext-context-menu";
-
-// Track state (in real app, persist to storage)
-const settings = { darkMode: false, notifications: true };
-
-const settingsMenu = createMenu({ id: "settings", title: "Settings" });
-
-settingsMenu
-  .addChild(createMenu(
-    { id: "dark-mode", title: "Dark Mode", type: "checkbox", checked: settings.darkMode },
-    async (info) => {
-      settings.darkMode = info.checked;
-      await updateMenu("dark-mode", { checked: settings.darkMode });
-      // Apply theme...
-    }
-  ))
-  .addChild(createMenu(
-    { id: "notifications", title: "Notifications", type: "checkbox", checked: settings.notifications },
-    async (info) => {
-      settings.notifications = info.checked;
-      await updateMenu("notifications", { checked: settings.notifications });
-    }
-  ));
-
-registerMenus([settingsMenu]);
-```
-
-### Example 4: Dynamic Menu Based on Page Content
-
-Show different options based on the current page:
-
-```typescript
-import { createMenu, registerMenus, removeAllMenus } from "@theluckystrike/webext-context-menu";
-
-function updateMenusForPage(hasVideo: boolean, hasAudio: boolean) {
-  removeAllMenus();
-  
-  const items = [createMenu({ id: "page-action", title: "Page Actions", contexts: ["page"] })];
-  
-  if (hasVideo) {
-    items[0].addChild(createMenu({ id: "download-video", title: "Download Video" }, downloadVideo));
-  }
-  
-  if (hasAudio) {
-    items[0].addChild(createMenu({ id: "download-audio", title: "Download Audio" }, downloadAudio));
-  }
-  
-  registerMenus(items);
+```json
+{
+  "manifest_version": 3,
+  "name": "My Extension",
+  "permissions": [
+    "contextMenus"
+  ]
 }
-
-// Call from content script or service worker based on page analysis
 ```
 
-## Chrome Extension Guide
+If using TypeScript with Chrome types, ensure you have the appropriate types installed:
 
-This package is part of the **chrome-extension-guide** ecosystem — a comprehensive collection of building blocks for building modern Chrome extensions.
+```bash
+npm install @types/chrome --save-dev
+```
 
-Explore related packages and guides:
+## Part of @zovo/webext
 
-- [chrome-extension-guide](https://github.com/theluckystrike/chrome-extension-guide) — Main repository with docs and examples
-- [@theluckystrike/webext-storage](https://github.com/theluckystrike/webext-storage) — Type-safe storage wrapper
-- [@theluckystrike/webext-messaging](https://github.com/theluckystrike/webext-messaging) — Simplified message passing
-- [Create Chrome Extension](https://github.com/theluckystrike/create-chrome-extension) — Scaffold a new extension in seconds
+This package is part of the [@zovo/webext](https://github.com/theluckystrike/webext) ecosystem — a collection of type-safe utilities for building Chrome extensions.
+
+Other packages in the ecosystem:
+- [webext-storage](https://github.com/theluckystrike/webext-storage) — Typed storage API
+- [webext-messaging](https://github.com/theluckystrike/webext-messaging) — Type-safe message passing
 
 ## License
 

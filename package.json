@@ -4,32 +4,42 @@
   "description": "Typed context menu builder with nested menus and fluent API for Chrome extensions. Part of @zovo/webext.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist"],
-  "sideEffects": false,
-  "scripts": {
-    "build": "tsc",
-    "test": "vitest run"
-  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/theluckystrike/webext-context-menu.git"
+    "url": "git+https://github.com/theluckystrike/webext-context-menu.git"
   },
   "homepage": "https://github.com/theluckystrike/webext-context-menu#readme",
   "bugs": {
     "url": "https://github.com/theluckystrike/webext-context-menu/issues"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "chrome-extension",
+    "context-menu",
+    "webextension",
+    "typescript"
+  ],
+  "author": "theluckystrike",
+  "license": "MIT",
   "engines": {
     "node": ">=18"
   },
-  "keywords": ["chrome-extension", "context-menu", "webextension", "typescript", "zovo"],
-  "author": "theluckystrike",
-  "license": "MIT",
   "devDependencies": {
     "@types/chrome": "^0.0.287",
     "typescript": "^5.7.0",

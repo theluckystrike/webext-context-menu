@@ -2,71 +2,69 @@
 
 Thank you for your interest in contributing! This guide will help you get started.
 
-## Getting Started
+## Development Setup
 
-1. **Fork** the repository
-2. **Clone** your fork:
+1. **Fork the repository**
+
+2. **Clone your fork**
    ```bash
    git clone https://github.com/YOUR_USERNAME/webext-context-menu.git
    cd webext-context-menu
    ```
 
-## Setup
+3. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
 
-Install dependencies using pnpm:
+4. **Create a feature branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 
-```bash
-pnpm install
-```
+## Development Workflow
 
-## Development
+1. **Make your changes** in the `src/` directory
 
-Build the TypeScript:
+2. **Run tests**
+   ```bash
+   pnpm test
+   ```
 
-```bash
-pnpm build
-```
+3. **Build the project**
+   ```bash
+   pnpm run build
+   ```
 
-Run tests:
+4. **Commit your changes**
+   ```bash
+   git add .
+   git commit -m "feat: add new feature"
+   ```
 
-```bash
-pnpm test
-```
+## Pull Request Process
 
-## Creating a Branch
+1. Push your branch to your fork:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
 
-Create a new branch for your feature or fix:
-
-```bash
-git checkout -b feature/your-feature-name
-```
-
-Or for bug fixes:
-
-```bash
-git checkout -b fix/your-bug-fix
-```
-
-## Making Changes
-
-1. Make your changes in the `src/` directory
-2. Ensure tests pass: `pnpm test`
-3. Build the project: `pnpm build`
-4. Commit your changes with a descriptive message
-
-## Pull Request
-
-1. Push your branch to your fork
 2. Open a Pull Request against the `main` branch
-3. Describe your changes and why they're needed
-4. Ensure all CI checks pass
+
+3. Ensure:
+   - All tests pass
+   - Code builds without errors
+   - New features include tests
 
 ## Code Style
 
-- Use TypeScript
+- Use TypeScript with strict mode
 - Follow existing code conventions
-- Add tests for new features
-- Keep the API consistent
+- Add JSDoc comments for public APIs
+
+## Reporting Issues
+
+Use the [GitHub Issues](https://github.com/theluckystrike/webext-context-menu/issues) to report bugs or request features.
 
 ## License
 
